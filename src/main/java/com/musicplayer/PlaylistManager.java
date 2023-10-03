@@ -1,45 +1,59 @@
 package com.musicplayer;
 
-import com.musicplayer.MusicController.*;
-import java.util.LinkedList;
-import java.util.List;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.advanced.AdvancedPlayer;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class PlaylistManager {
-    private List<String> playlist;
+    private CircularDoublyLinkedList playlist;
+    private AdvancedPlayer player;
 
     public PlaylistManager() {
-        playlist = new LinkedList<>();
+        playlist = new CircularDoublyLinkedList();
     }
 
     public void addSong(String song) {
-        playlist.add(song);
+        playlist.addNode(song);
     }
 
     public void removeSong(String song) {
-        playlist.remove(song);
+        playlist.removeNode(song);
     }
 
-    public void playPlaylist() {
-        for (String song : playlist) {
-            try {
-                System.out.println("Now playing: " + song);
-                Player.sPlayer(song);
-            } catch (Exception e) {
-                System.err.println("Error playing " + song + ": " + e.getMessage());
-            }
+    public void playPlaylist() throws InterruptedException {
+        CircularDoublyLinkedList.Node current = playlist.getFirst();
+
+        while (true) {
+            System.out.println("Now playing: " + current.getData());
+            playSong(current.getData());
+
+            // Move to the next song
+            current = current.getNext();
+
+            // You can exit the loop when you want
+            // For example, break; if some condition is met
         }
     }
 
-    public static void main(String[] args) {
+    private void playSong(String song) {
+        try {
+            FileInputStream file = new FileInputStream(song);
+            player = new AdvancedPlayer(file);
+            player.play();
+        } catch (FileNotFoundException | JavaLayerException e) {
+            System.err.println("Error playing " + song + ": " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) throws InterruptedException {
         PlaylistManager manager = new PlaylistManager();
 
         // Add songs to the playlist
-        manager.addSong("Akatsuki.mp3");
-        // manager.addSong("song2.mp3");
-        // manager.addSong("song3.mp3");
-
-        // Remove a song from the playlist (optional)
-        // manager.removeSong("song2.mp3");
+        // manager.addSong("Akatsuki.mp3");
+        // manager.addSong("NeonBlade.mp3");
+        // manager.addSong("itachi.mp3");
 
         // Play the playlist
         manager.playPlaylist();

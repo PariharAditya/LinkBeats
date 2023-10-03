@@ -8,6 +8,7 @@
   <groupId>com.musicplayer</groupId>
   <artifactId>minorproject</artifactId>
   <version>1.0</version>
+  <packaging>jar</packaging>
 
   <name>minorproject</name>
   <!-- FIXME change it to the project's website -->
@@ -15,8 +16,10 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <javafx.version>17</javafx.version>
+    <javafx.maven.plugin.version>17</javafx.maven.plugin.version>
   </properties>
 
   <dependencies>
@@ -54,7 +57,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.8.0</version>
+          <version>3.8.1</version>
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
