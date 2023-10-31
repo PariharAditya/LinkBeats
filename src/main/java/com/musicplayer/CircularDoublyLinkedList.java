@@ -19,6 +19,10 @@ public class CircularDoublyLinkedList {
         public Node getNext() {
             return next;
         }
+        
+        public Node getPrevious() {
+            return previous;
+        }
     }
 
     private Node head;
@@ -51,37 +55,53 @@ public class CircularDoublyLinkedList {
         }
     }
 
-    public void removeNode(String data) {
-        if (isEmpty()) {
-            System.out.println("Playlist is empty. Cannot remove node.");
-            return;
-        }
-
-        Node current = head;
-
-        do {
-            if (current.data.equals(data)) {
-                Node previousNode = current.previous;
-                Node nextNode = current.next;
-
-                previousNode.next = nextNode;
-                nextNode.previous = previousNode;
-
-                if (current == head) {
-                    head = nextNode;
-                }
-
-                System.out.println("Removed: " + data);
-                return;
-            }
-
-            current = current.next;
-        } while (current != head);
-
-        System.out.println("Song not found: " + data);
-    }
-
     public Node getFirst() {
         return head;
     }
+    
+    public void playNextSong() {
+        if (isEmpty()) {
+            System.out.println("Playlist is empty. Cannot play next song.");
+            return;
+        }
+
+        // Get the currently playing song (head)
+        Node currentSong = head;
+
+        // Play the next song (the one after the current song)
+        Node nextSong = currentSong.next;
+
+        // System.out.println("Playing next song: " + nextSong.getData());
+
+        // Update the currently playing song to the next song
+        head = nextSong;
+    }
+    
+    public String getCurrentSong() {
+        if (isEmpty()) {
+            return "No song is currently playing";
+        }
+
+        // Get the currently playing song (head)
+        return head.getData();
+    }
+    
+    public void playPreviousSong() {
+        if (isEmpty()) {
+            System.out.println("Playlist is empty. Cannot play previous song.");
+            return;
+        }
+
+        // Get the currently playing song (head)
+        Node currentSong = head;
+
+        // Play the previous song (the one before the current song)
+        Node previousSong = currentSong.getPrevious();
+
+        System.out.println("Playing previous song: " + previousSong.getData());
+
+        // Update the currently playing song to the previous song
+        head = previousSong;
+    }
+
 }

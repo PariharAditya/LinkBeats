@@ -1,34 +1,25 @@
 package com.musicplayer;
 
-import javazoom.jl.decoder.JavaLayerException;
-import javazoom.jl.player.advanced.AdvancedPlayer;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
-import com.musicplayer.CircularDoublyLinkedList.Node;
 
-public class PlaylistManager {
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.advanced.AdvancedPlayer;
+
+public class Player {
     private static AdvancedPlayer player;
     private static boolean isPlaying = false;
-    private static CircularDoublyLinkedList playlist = new CircularDoublyLinkedList();
+    private static int currentSongIndex = 0;
+    private static String[] playlist = {
+        "Akatsuki.mp3",
+        "NeonBlade.mp3",
+        "Itachi.mp3"
+        // Add more songs to your playlist as needed
+    };
 
     public static void main(String[] args) {
-        startMusicPlayer();
-    }
-
-    public static void startMusicPlayer() {
-        // Add songs to the playlist
-        playlist.addNode("Akatsuki.mp3");
-        playlist.addNode("NeonBlade.mp3");
-        playlist.addNode("Itachi.mp3");
-        // Add more songs to your playlist as needed
-
-        // Print the playlist
-        System.out.println(getPlaylist());
-
-        // Start playing the first song
-        playSong(playlist.getFirst().getData());
+        playSong(playlist[currentSongIndex]);
 
         // Start a thread for taking input
         new Thread(() -> {
@@ -48,7 +39,6 @@ public class PlaylistManager {
 
             // Start a thread for playing the song
             new Thread(() -> {
-                // isPlaying = true;
                 try {
                     player.play();
                 } catch (JavaLayerException e) {
@@ -68,7 +58,7 @@ public class PlaylistManager {
         }
     }
 
-    public static void handleInput(String input) {
+    private static void handleInput(String input) {
         if (isPlaying) {
             System.out.println("Stopping current song...");
             stopSong();
@@ -76,39 +66,18 @@ public class PlaylistManager {
 
         if (input.equalsIgnoreCase("N")) {
             // Play next song
-            playlist.playNextSong();
-            System.out.println(playlist.getCurrentSong());
-            playSong(playlist.getCurrentSong());
+            currentSongIndex = (currentSongIndex + 1) % playlist.length;
+            System.out.println("Playing next song: " + playlist[currentSongIndex]);
+            playSong(playlist[currentSongIndex]);
         } else if (input.equalsIgnoreCase("P")) {
             // Play previous song
-            playlist.playPreviousSong();
-            System.out.println(playlist.getCurrentSong());
-            playSong(playlist.getCurrentSong());
+            currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
+            System.out.println("Playing previous song: " + playlist[currentSongIndex]);
+            playSong(playlist[currentSongIndex]);
         } else if (input.equalsIgnoreCase("X")) {
             System.out.println("Exiting...");
             System.exit(0);
         }
+        // You can add more commands as needed
     }
-
-    public static String getPlaylist() {
-        if (playlist.isEmpty()) {
-            return "Playlist is empty";
-        } else {
-            StringBuilder sb = new StringBuilder();
-            Node current = playlist.getFirst();
-            do {
-                sb.append(current.getData()).append("\n");
-                current = current.getNext();
-            } while (current != playlist.getFirst());
-            return sb.toString();
-        }
-    }
-
-    public static Node getFirst() {
-        return playlist.getFirst();
-    }
-    
-
-
-    
 }
