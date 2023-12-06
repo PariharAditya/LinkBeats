@@ -2,6 +2,8 @@ package com.musicplayer;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.advanced.AdvancedPlayer;
+import javazoom.jl.player.advanced.PlaybackEvent;
+import javazoom.jl.player.advanced.PlaybackListener;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,49 +20,72 @@ public class PlaylistManager {
     }
 
     public static void startMusicPlayer() {
+        Scanner scanner = new Scanner(System.in);
+
         // Add songs to the playlist
-        playlist.addNode("Akatsuki.mp3");
-        playlist.addNode("NeonBlade.mp3");
-        playlist.addNode("Itachi.mp3");
-        // Add more songs to your playlist as needed
+        System.out.println("Enter the names of the songs you want to add to the playlist. Type 'done' when finished.");
+        while (true) {
+            String song = scanner.nextLine();
+            if (song.equalsIgnoreCase("done")) {
+                break;
+            }
+            addSong(song);
+        }
 
         // Print the playlist
         System.out.println(getPlaylist());
 
         // Start playing the first song
-        playSong(playlist.getFirst().getData());
+        if (playlist.getFirst() != null) {
+            playSong(playlist.getFirst().getData());
+        } else {
+            System.out.println("Playlist is empty.");
+        }
 
         // Start a thread for taking input
         new Thread(() -> {
-            Scanner scanner = new Scanner(System.in);
             while (true) {
+                System.out.println("Enter a command:");
                 String input = scanner.nextLine();
                 handleInput(input);
             }
         }).start();
+
+    }
+
+    public static void addSong(String song) {
+        playlist.addNode(song);
     }
 
     public static void playSong(String song) {
-        try {
-            FileInputStream file = new FileInputStream(song);
-            player = new AdvancedPlayer(file);
-            isPlaying = true;
+    try {
+        FileInputStream file = new FileInputStream(song);
+        player = new AdvancedPlayer(file);
+        isPlaying = true;
 
-            // Start a thread for playing the song
-            new Thread(() -> {
-                // isPlaying = true;
-                try {
-                    player.play();
-                } catch (JavaLayerException e) {
-                    e.printStackTrace();
-                } finally {
-                    isPlaying = false;
-                }
-            }).start();
-        } catch (FileNotFoundException | JavaLayerException e) {
-            e.printStackTrace();
-        }
+        // Start a thread for playing the song
+        new Thread(() -> {
+            try {
+                player.setPlayBackListener(new PlaybackListener() {
+                    @Override
+                    public void playbackFinished(PlaybackEvent evt) {
+                        // Song playback finished, play the next song
+                        isPlaying = false;
+                        playlist.playNextSong();
+                        playSong(playlist.getCurrentSong());
+                    }
+                });
+
+                player.play();
+            } catch (JavaLayerException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    } catch (FileNotFoundException | JavaLayerException e) {
+        e.printStackTrace();
     }
+}
+
 
     public static void stopSong() {
         if (player != null) {
@@ -107,8 +132,11 @@ public class PlaylistManager {
     public static Node getFirst() {
         return playlist.getFirst();
     }
-    
+    public static void playNextSong() {
+        playlist.playNextSong();
+    }
 
-
-    
+    public static void playPreviousSong() {
+        playlist.playPreviousSong();
+    }
 }
